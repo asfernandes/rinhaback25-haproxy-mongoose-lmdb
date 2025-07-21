@@ -28,26 +28,23 @@ namespace rinhaback::api
 
 		const int endiannessFlags = std::endian::native == std::endian::little ? (MDB_REVERSEKEY | MDB_REVERSEDUP) : 0;
 
-		checkMdbError(mdb_env_create(&env), __FILE__, __LINE__);
-		checkMdbError(mdb_env_set_mapsize(env, Config::databaseSize), __FILE__, __LINE__);
-		checkMdbError(mdb_env_set_maxdbs(env, std::to_underlying(PaymentGateway::SIZE)), __FILE__, __LINE__);
+		checkMdbError(mdb_env_create(&env));
+		checkMdbError(mdb_env_set_mapsize(env, Config::databaseSize));
+		checkMdbError(mdb_env_set_maxdbs(env, std::to_underlying(PaymentGateway::SIZE)));
 		checkMdbError(mdb_env_open(env, Config::database.c_str(),
-						  MDB_WRITEMAP | MDB_NOMETASYNC | MDB_NOSYNC | MDB_NOTLS | MDB_NOMEMINIT |
-							  (Config::databaseInit ? MDB_CREATE : 0),
-						  0664),
-			__FILE__, __LINE__);
+			MDB_WRITEMAP | MDB_NOMETASYNC | MDB_NOSYNC | MDB_NOTLS | MDB_NOMEMINIT |
+				(Config::databaseInit ? MDB_CREATE : 0),
+			0664));
 
 		Transaction transaction(*this, 0);
 
 		checkMdbError(
 			mdb_dbi_open(transaction.txn, "default", MDB_CREATE | MDB_DUPSORT | MDB_DUPFIXED | endiannessFlags,
-				&dbis[std::to_underlying(PaymentGateway::DEFAULT)]),
-			__FILE__, __LINE__);
+				&dbis[std::to_underlying(PaymentGateway::DEFAULT)]));
 
 		checkMdbError(
 			mdb_dbi_open(transaction.txn, "fallback", MDB_CREATE | MDB_DUPSORT | MDB_DUPFIXED | endiannessFlags,
-				&dbis[std::to_underlying(PaymentGateway::FALLBACK)]),
-			__FILE__, __LINE__);
+				&dbis[std::to_underlying(PaymentGateway::FALLBACK)]));
 	}
 
 	Connection::~Connection()

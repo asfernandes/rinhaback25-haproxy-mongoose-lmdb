@@ -23,8 +23,7 @@ namespace rinhaback::api
 
 		MDB_val mdbKey(sizeof(key), &key);
 		MDB_val mdbData(sizeof(data), &data);
-		checkMdbError(mdb_put(transaction.txn, connection.dbis[std::to_underlying(gateway)], &mdbKey, &mdbData, 0),
-			__FILE__, __LINE__);
+		checkMdbError(mdb_put(transaction.txn, connection.dbis[std::to_underlying(gateway)], &mdbKey, &mdbData, 0));
 	}
 
 	PaymentRepository::PaymentsGatewaySummaryResponse PaymentRepository::getPaymentsSummary(
@@ -43,8 +42,7 @@ namespace rinhaback::api
 		MDB_val mdbData;
 
 		MDB_cursor* cursor;
-		checkMdbError(mdb_cursor_open(transaction.txn, connection.dbis[std::to_underlying(gateway)], &cursor), __FILE__,
-			__LINE__);
+		checkMdbError(mdb_cursor_open(transaction.txn, connection.dbis[std::to_underlying(gateway)], &cursor));
 
 		int rc = mdb_cursor_get(cursor, &mdbKey, &mdbData, (from ? MDB_SET_RANGE : MDB_FIRST));
 
@@ -53,7 +51,7 @@ namespace rinhaback::api
 			mdb_cursor_close(cursor);
 
 			if (rc != MDB_NOTFOUND)
-				checkMdbError(rc, __FILE__, __LINE__);
+				checkMdbError(rc);
 
 			return response;
 		}
@@ -78,7 +76,7 @@ namespace rinhaback::api
 		mdb_cursor_close(cursor);
 
 		if (rc != MDB_NOTFOUND)
-			checkMdbError(rc, __FILE__, __LINE__);
+			checkMdbError(rc);
 
 		return response;
 	};
@@ -88,6 +86,6 @@ namespace rinhaback::api
 		Connection& connection = getConnection();
 		Transaction transaction(connection, 0);
 
-		checkMdbError(mdb_drop(transaction.txn, connection.dbis[std::to_underlying(gateway)], 0), __FILE__, __LINE__);
+		checkMdbError(mdb_drop(transaction.txn, connection.dbis[std::to_underlying(gateway)], 0));
 	}
 }  // namespace rinhaback::api

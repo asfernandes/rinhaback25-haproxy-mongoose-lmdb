@@ -1,10 +1,15 @@
 #pragma once
 
 #include <array>
+#include <format>
 #include <print>
 #include <utility>
 #include <cstdint>
 #include "lmdb.h"
+
+#ifndef NDEBUG
+#include <source_location>
+#endif
 
 
 namespace rinhaback::api
@@ -18,12 +23,23 @@ namespace rinhaback::api
 
 	using CorrelationId = std::array<char, 36>;
 
-	inline void checkMdbError(int rc, const char* file, unsigned line)
+	inline void checkMdbError(int rc
+#ifndef NDEBUG
+		,
+		const std::source_location location = std::source_location::current()
+#endif
+	)
 	{
 		if (rc != 0)
 		{
-			std::println(stderr, "MDB error: {} in {} at line {}", rc, file, line);
-			throw std::runtime_error("MDB error: " + std::to_string(rc));
+			std::string msg =
+#ifndef NDEBUG
+				std::format("MDB error: {} in {} at line {}", rc, location.file_name(), location.line());
+#else
+				std::format("MDB error: {}", rc);
+#endif
+			std::println(stderr, "{}", msg);
+			throw std::runtime_error(msg);
 		}
 	}
 
@@ -48,7 +64,7 @@ namespace rinhaback::api
 			: connection(connection),
 			  flags(flags)
 		{
-			checkMdbError(mdb_txn_begin(connection.env, nullptr, flags, &txn), __FILE__, __LINE__);
+			checkMdbError(mdb_txn_begin(connection.env, nullptr, flags, &txn));
 		}
 
 		~Transaction()
