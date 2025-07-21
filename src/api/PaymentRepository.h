@@ -35,6 +35,9 @@ namespace rinhaback::api
 		{
 		}
 
+		PaymentRepository(const PaymentRepository&) = delete;
+		PaymentRepository& operator=(const PaymentRepository&) = delete;
+
 	public:
 		void postPayment(double amount, const CorrelationId& correlationId, DateTimeMillis requestedAt);
 

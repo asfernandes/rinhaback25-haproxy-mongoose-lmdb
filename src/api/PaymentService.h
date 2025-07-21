@@ -19,7 +19,11 @@ namespace rinhaback::api
 		};
 
 	public:
-		PaymentService() { }
+		PaymentService() = default;
+
+		PaymentService(const PaymentService&) = delete;
+		PaymentService& operator=(const PaymentService&) = delete;
+
 
 	public:
 		void postPayment(

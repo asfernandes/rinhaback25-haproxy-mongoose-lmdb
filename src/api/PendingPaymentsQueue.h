@@ -22,6 +22,12 @@ namespace rinhaback::api
 		};
 
 	public:
+		PendingPaymentsQueue() = default;
+
+		PendingPaymentsQueue(const PendingPaymentsQueue&) = delete;
+		PendingPaymentsQueue& operator=(const PendingPaymentsQueue&) = delete;
+
+	public:
 		void enqueue(const Payment& payment)
 		{
 			{  // scope
